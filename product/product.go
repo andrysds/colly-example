@@ -24,7 +24,7 @@ func (v *Variant) IsPriceChanged(oldPrice int) bool {
 	return oldPrice != v.Price
 }
 
-func (v Variant) IsStockLevelChange(oldStockLevel int) bool {
+func (v *Variant) IsStockLevelChange(oldStockLevel int) bool {
 	return oldStockLevel != v.stockLevel()
 }
 
