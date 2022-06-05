@@ -63,6 +63,7 @@ func (p *Partner) Login() error {
 	if err != nil {
 		return err
 	}
+	req.Header.Set("Content-Type", "application/json")
 
 	res, err := p.httpClient.Do(req)
 	if err != nil {
@@ -84,8 +85,16 @@ func (p *Partner) Login() error {
 		return err
 	}
 
+	if loginRes.Data.Token == "" {
+		return fmt.Errorf("got empty token, resBody:%v,", string(resBody))
+	}
+
 	p.authToken = loginRes.Data.Token
 	return nil
+}
+
+type getProductResponse struct {
+	Data *product.Product `json:"data"`
 }
 
 func (p *Partner) GetProduct(slug string) (*product.Product, error) {
@@ -111,7 +120,7 @@ func (p *Partner) GetProduct(slug string) (*product.Product, error) {
 		return nil, err
 	}
 
-	var pp *product.Product
+	var pp getProductResponse
 	err = json.Unmarshal(body, &pp)
-	return pp, err
+	return pp.Data, err
 }

@@ -20,12 +20,12 @@ func main() {
 	csvPath := os.Getenv(csvPathEnvKey)
 	f, err := os.Open(csvPath)
 	if err != nil {
-		log.Println("[ERROR] [opening csv file]", err)
+		log.Fatalln("[ERROR] [opening csv file]", err)
 	}
 
 	r, err := csv.NewCSV(f)
 	if err != nil {
-		log.Println("[ERROR] [NewCSV]", err)
+		log.Fatalln("[ERROR] [NewCSV]", err)
 	}
 
 	p := partner.NewPartner()
@@ -33,7 +33,7 @@ func main() {
 	c := checker.NewChecker(r, p)
 
 	if err := c.Check(); err != nil {
-		log.Println("[ERROR] [Check]", err)
+		log.Fatalln("[ERROR] [Check]", err)
 	}
 
 	log.Println("exiting...")

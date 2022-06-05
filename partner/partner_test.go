@@ -196,13 +196,15 @@ func TestPartner_GetProduct(t *testing.T) {
 
 				mockResJsonBody, _ := json.Marshal(
 					map[string]interface{}{
-						"name":        mockProduct.Name,
-						"description": mockProduct.Description,
-						"variants": []map[string]interface{}{
-							{
-								"variants_name": mockProduct.Variants[0].Name,
-								"price":         mockProduct.Variants[0].Price,
-								"stock":         mockProduct.Variants[0].Stock,
+						"data": map[string]interface{}{
+							"name":        mockProduct.Name,
+							"description": mockProduct.Description,
+							"variants": []map[string]interface{}{
+								{
+									"variants_name": mockProduct.Variants[0].Name,
+									"price":         mockProduct.Variants[0].Price,
+									"stock":         mockProduct.Variants[0].Stock,
+								},
 							},
 						},
 					},

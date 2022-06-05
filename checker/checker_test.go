@@ -13,6 +13,7 @@ func TestNewChecker(t *testing.T) {
 	mockStockLevelKey := "header1"
 	mockPriceKey := "header2"
 	mockProductSlugKey := "header3"
+	mockVariantKey := "header4"
 	mockPartner := &MockPartner{}
 
 	mockRecords := []csv.Record{
@@ -28,9 +29,11 @@ func TestNewChecker(t *testing.T) {
 	os.Setenv(stockLevelKeyEnvKey, mockStockLevelKey)
 	os.Setenv(priceKeyEnvKey, mockPriceKey)
 	os.Setenv(productSlugKeyEnvKey, mockProductSlugKey)
+	os.Setenv(variantNameKeyEnvKey, mockVariantKey)
 	defer os.Unsetenv(stockLevelKeyEnvKey)
 	defer os.Unsetenv(mockPriceKey)
 	defer os.Unsetenv(productSlugKeyEnvKey)
+	defer os.Unsetenv(variantNameKeyEnvKey)
 
 	want := &Checker{
 		records:        mockRecords,
@@ -38,6 +41,7 @@ func TestNewChecker(t *testing.T) {
 		stockLevelKey:  mockStockLevelKey,
 		priceKey:       mockPriceKey,
 		productSlugKey: mockProductSlugKey,
+		variantKey:     mockVariantKey,
 	}
 
 	if got := NewChecker(mockRecords, mockPartner); !reflect.DeepEqual(got, want) {

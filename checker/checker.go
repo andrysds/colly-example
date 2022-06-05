@@ -1,10 +1,10 @@
 package checker
 
 import (
-	"encoding/json"
 	"log"
 	"os"
 	"strconv"
+	"strings"
 
 	"github.com/andrysds/dropship-checker/csv"
 	"github.com/andrysds/dropship-checker/product"
@@ -14,6 +14,7 @@ const (
 	stockLevelKeyEnvKey  = "STOCK_LEVEL_KEY"
 	priceKeyEnvKey       = "PRICE_KEY"
 	productSlugKeyEnvKey = "PRODUCT_SLUG_KEY"
+	variantNameKeyEnvKey = "VARIANT_NAME_KEY"
 )
 
 type Partner interface {
@@ -27,6 +28,7 @@ type Checker struct {
 	stockLevelKey  string
 	priceKey       string
 	productSlugKey string
+	variantKey     string
 }
 
 func NewChecker(records []csv.Record, partner Partner) *Checker {
@@ -36,6 +38,7 @@ func NewChecker(records []csv.Record, partner Partner) *Checker {
 		stockLevelKey:  os.Getenv(stockLevelKeyEnvKey),
 		priceKey:       os.Getenv(priceKeyEnvKey),
 		productSlugKey: os.Getenv(productSlugKeyEnvKey),
+		variantKey:     os.Getenv(variantNameKeyEnvKey),
 	}
 }
 
@@ -46,36 +49,50 @@ func (c *Checker) Check() error {
 
 	for i, record := range c.records {
 		data := record.Data
+		slug := data[c.productSlugKey]
 
-		product, err := c.partner.GetProduct(data[c.productSlugKey])
+		if slug == "" {
+			log.Println("found empty slug at row no.", i+1)
+			break
+		}
+
+		product, err := c.partner.GetProduct(slug)
 		if err != nil {
 			log.Println("[ERROR] [GetProduct]", err)
 		}
 
-		productJSON, err := json.Marshal(product)
-		if err != nil {
-			log.Println("[ERROR] [parsing product json]", err)
+		found := false
+		for _, variant := range product.Variants {
+			if variant.Name == record.Data[c.variantKey] {
+				found = true
+
+				oldPriceStr := data[c.priceKey]
+				oldPriceStr = strings.ReplaceAll(oldPriceStr, "Rp", "")
+				oldPriceStr = strings.ReplaceAll(oldPriceStr, ",", "")
+				oldPrice, err := strconv.ParseInt(oldPriceStr, 10, 32)
+				if err != nil {
+					log.Println("[ERROR] [parsing old price]", err)
+				}
+
+				if variant.IsPriceChanged(int(oldPrice)) {
+					log.Printf("[WARN] price change detected at row no. %d; product: %v\n", i+1, slug)
+				}
+
+				oldStockLevel, err := strconv.ParseInt(data[c.stockLevelKey], 10, 32)
+				if err != nil {
+					log.Println("[ERROR] [parsing old stock level]", err)
+				}
+
+				if variant.IsStockLevelChange(int(oldStockLevel)) {
+					log.Printf("[WARN] stock level change detected at row no. %d; slug: %v\n", i+1, slug)
+				}
+
+				break
+			}
 		}
 
-		variants := product.Variants
-		for _, variant := range variants {
-			oldPrice, err := strconv.ParseInt(data[c.priceKey], 10, 32)
-			if err != nil {
-				log.Println("[ERROR] [parsing old price]", err)
-			}
-
-			if variant.IsPriceChanged(int(oldPrice)) {
-				log.Printf("[WARN] price change detected at row no. %d; product: %v\n", i+1, string(productJSON))
-			}
-
-			oldStockLevel, err := strconv.ParseInt(data[c.stockLevelKey], 10, 32)
-			if err != nil {
-				log.Println("[ERROR] [parsing old stock level]", err)
-			}
-
-			if variant.IsStockLevelChange(int(oldStockLevel)) {
-				log.Printf("[WARN] stock level change detected at row no. %d; product: %v\n", i+1, string(productJSON))
-			}
+		if !found {
+			log.Printf("[ERROR] product: %v,  variant: %v, not found", product.Name, data[c.variantKey])
 		}
 	}
 
