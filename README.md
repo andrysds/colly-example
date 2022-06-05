@@ -1,1 +1,1 @@
-i use this code to check my dropshipping stocks to partner.
+I use this code to check my dropshipping stocks to partner.
