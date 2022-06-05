@@ -75,7 +75,7 @@ func (c *Checker) Check() error {
 				}
 
 				if variant.IsPriceChanged(int(oldPrice)) {
-					log.Printf("[WARN] price change detected at row no. %d; product: %v\n", i+1, slug)
+					log.Printf("[WARN] price change detected at row no. %d; new price: %d; product: %v\n", i+1, variant.Price, slug)
 				}
 
 				oldStockLevel, err := strconv.ParseInt(data[c.stockLevelKey], 10, 32)
@@ -84,7 +84,7 @@ func (c *Checker) Check() error {
 				}
 
 				if variant.IsStockLevelChange(int(oldStockLevel)) {
-					log.Printf("[WARN] stock level change detected at row no. %d; slug: %v\n", i+1, slug)
+					log.Printf("[WARN] stock level change detected at row no. %d; new stock level: %d; slug: %v\n", i+1, variant.StockLevel(), slug)
 				}
 
 				break

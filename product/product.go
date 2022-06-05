@@ -17,7 +17,7 @@ func (p *Product) VariantMap() map[string]Variant {
 type Variant struct {
 	Name  string `json:"variants_name"`
 	Price int    `json:"price"`
-	Stock int    `json:"stok"`
+	Stock int    `json:"stock"`
 }
 
 func (v *Variant) IsPriceChanged(oldPrice int) bool {
@@ -25,7 +25,7 @@ func (v *Variant) IsPriceChanged(oldPrice int) bool {
 }
 
 func (v *Variant) IsStockLevelChange(oldStockLevel int) bool {
-	return oldStockLevel != v.stockLevel()
+	return oldStockLevel != v.StockLevel()
 }
 
 const (
@@ -34,12 +34,12 @@ const (
 	HighStock  = iota
 )
 
-func (v *Variant) stockLevel() int {
-	if v.Stock < 1 {
+func (v *Variant) StockLevel() int {
+	if v.Stock < 5 {
 		return OutOfStock
 	}
 
-	if v.Stock < 10 {
+	if v.Stock < 20 {
 		return LowStock
 	}
 

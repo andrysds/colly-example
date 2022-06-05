@@ -85,7 +85,7 @@ func TestVariant_IsStockLevelChange(t *testing.T) {
 	}
 }
 
-func TestVariant_stockLevel(t *testing.T) {
+func TestVariant_StockLevel(t *testing.T) {
 	tests := []struct {
 		name  string
 		stock int
@@ -115,7 +115,7 @@ func TestVariant_stockLevel(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			v := Variant{Stock: tt.stock}
-			if got := v.stockLevel(); got != tt.want {
+			if got := v.StockLevel(); got != tt.want {
 				t.Errorf("variant.stockLevel() = %v, want %v", got, tt.want)
 			}
 		})
