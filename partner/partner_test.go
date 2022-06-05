@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"os"
 	"reflect"
 	"testing"
 
@@ -14,9 +15,27 @@ import (
 )
 
 func TestNewPartner(t *testing.T) {
+	mockUsername := "sample username"
+	mockPassword := "sample password"
+	mockLoginUrl := "https://example.com/login"
+	mockGetProductBaseUrl := "https://example.com/product/"
+
+	os.Setenv(usernameEnvKey, mockUsername)
+	os.Setenv(passwordEnvKey, mockPassword)
+	os.Setenv(loginUrlEnvKey, mockLoginUrl)
+	os.Setenv(getProductBaseUrlEnvKey, mockGetProductBaseUrl)
+	defer os.Unsetenv(usernameEnvKey)
+	defer os.Unsetenv(passwordEnvKey)
+	defer os.Unsetenv(loginUrlEnvKey)
+	defer os.Unsetenv(getProductBaseUrlEnvKey)
+
 	want := &Partner{
-		httpClient: &http.Client{},
-		authToken:  "",
+		httpClient:        &http.Client{},
+		authToken:         "",
+		username:          mockUsername,
+		password:          mockPassword,
+		loginUrl:          mockLoginUrl,
+		getProductBaseUrl: mockGetProductBaseUrl,
 	}
 	if got := NewPartner(); !reflect.DeepEqual(got, want) {
 		t.Errorf("NewPartner() = %v, want %v", got, want)
@@ -27,7 +46,7 @@ func TestPartner_Login(t *testing.T) {
 	mockUsername := "sample username"
 	mockPassword := "sample password"
 	mockAuthToken := "sample auth token"
-	mockLoginURL := "https://example.com/login"
+	mockLoginUrl := "https://example.com/login"
 
 	mockReqMatcher := func(req *http.Request) bool {
 		mockReqJsonBody, _ := json.Marshal(
@@ -37,7 +56,7 @@ func TestPartner_Login(t *testing.T) {
 			},
 		)
 		mockReqBody := bytes.NewBuffer(mockReqJsonBody)
-		mockReq, _ := http.NewRequest(http.MethodPost, mockLoginURL, mockReqBody)
+		mockReq, _ := http.NewRequest(http.MethodPost, mockLoginUrl, mockReqBody)
 
 		return req.Method == mockReq.Method &&
 			reflect.DeepEqual(req.URL, mockReq.URL) &&
@@ -102,7 +121,7 @@ func TestPartner_Login(t *testing.T) {
 				httpClient: tt.httpClient(),
 				username:   mockUsername,
 				password:   mockPassword,
-				loginUrl:   mockLoginURL,
+				loginUrl:   mockLoginUrl,
 			}
 			err := p.Login()
 			if (err != nil) != tt.wantErr {
