@@ -1,23 +1,40 @@
-// https://github.com/andrysds/colly-example
-
 package main
 
 import (
 	"log"
 	"os"
 
-	"github.com/gocolly/colly"
+	"github.com/andrysds/colly-example/checker"
+	"github.com/andrysds/colly-example/csv"
+	"github.com/andrysds/colly-example/partner"
 	"github.com/subosito/gotenv"
 )
+
+const csvPathEnvKey = "CSV_PATH"
 
 func main() {
 	log.Println("starting...")
 
 	gotenv.Load()
 
-	c := colly.NewCollector()
+	csvPath := os.Getenv(csvPathEnvKey)
+	f, err := os.Open(csvPath)
+	if err != nil {
+		log.Println("[ERROR] [opening csv file]", err)
+	}
 
-	c.Visit(os.Getenv("LOGIN_URL"))
+	r, err := csv.NewCSV(f)
+	if err != nil {
+		log.Println("[ERROR] [NewCSV]", err)
+	}
+
+	p := partner.NewPartner()
+
+	c := checker.NewChecker(r, p)
+
+	if err := c.Check(); err != nil {
+		log.Println("[ERROR] [Check]", err)
+	}
 
 	log.Println("exiting...")
 }
