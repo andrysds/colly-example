@@ -1,4 +1,4 @@
-module github.com/andrysds/colly-example
+module github.com/andrysds/dropship-checker
 
 go 1.16
 

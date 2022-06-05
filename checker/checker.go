@@ -6,8 +6,8 @@ import (
 	"os"
 	"strconv"
 
-	"github.com/andrysds/colly-example/csv"
-	"github.com/andrysds/colly-example/product"
+	"github.com/andrysds/dropship-checker/csv"
+	"github.com/andrysds/dropship-checker/product"
 )
 
 const (

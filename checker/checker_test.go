@@ -5,8 +5,8 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/andrysds/colly-example/csv"
-	"github.com/andrysds/colly-example/product"
+	"github.com/andrysds/dropship-checker/csv"
+	"github.com/andrysds/dropship-checker/product"
 )
 
 func TestNewChecker(t *testing.T) {

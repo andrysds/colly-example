@@ -3,7 +3,7 @@
 package checker
 
 import (
-	product "github.com/andrysds/colly-example/product"
+	product "github.com/andrysds/dropship-checker/product"
 	mock "github.com/stretchr/testify/mock"
 )
 

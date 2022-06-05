@@ -8,7 +8,7 @@ import (
 	"net/http"
 	"os"
 
-	"github.com/andrysds/colly-example/product"
+	"github.com/andrysds/dropship-checker/product"
 )
 
 const (

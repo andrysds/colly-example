@@ -4,9 +4,9 @@ import (
 	"log"
 	"os"
 
-	"github.com/andrysds/colly-example/checker"
-	"github.com/andrysds/colly-example/csv"
-	"github.com/andrysds/colly-example/partner"
+	"github.com/andrysds/dropship-checker/checker"
+	"github.com/andrysds/dropship-checker/csv"
+	"github.com/andrysds/dropship-checker/partner"
 	"github.com/subosito/gotenv"
 )
 
