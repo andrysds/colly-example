@@ -1,6 +1,7 @@
 package main
 
 import (
+	"flag"
 	"log"
 	"os"
 
@@ -13,9 +14,12 @@ import (
 const csvPathEnvKey = "CSV_PATH"
 
 func main() {
+	envPath := flag.String("env", ".env", "your env file path")
+	flag.Parse()
+
 	log.Println("starting...")
 
-	gotenv.Load()
+	gotenv.Load(*envPath)
 
 	csvPath := os.Getenv(csvPathEnvKey)
 	f, err := os.Open(csvPath)
