@@ -15,6 +15,7 @@ const (
 	priceKeyEnvKey       = "PRICE_KEY"
 	productSlugKeyEnvKey = "PRODUCT_SLUG_KEY"
 	variantNameKeyEnvKey = "VARIANT_NAME_KEY"
+	skuKeyEnvKey         = "SKU_KEY"
 )
 
 type Partner interface {
@@ -29,6 +30,7 @@ type Checker struct {
 	priceKey       string
 	productSlugKey string
 	variantKey     string
+	skuKey         string
 }
 
 func NewChecker(records []csv.Record, partner Partner) *Checker {
@@ -39,6 +41,7 @@ func NewChecker(records []csv.Record, partner Partner) *Checker {
 		priceKey:       os.Getenv(priceKeyEnvKey),
 		productSlugKey: os.Getenv(productSlugKeyEnvKey),
 		variantKey:     os.Getenv(variantNameKeyEnvKey),
+		skuKey:         os.Getenv(skuKeyEnvKey),
 	}
 }
 
@@ -52,7 +55,6 @@ func (c *Checker) Check() error {
 		slug := data[c.productSlugKey]
 
 		if slug == "" {
-			log.Println("found empty slug at row no.", i+1)
 			break
 		}
 
@@ -65,7 +67,7 @@ func (c *Checker) Check() error {
 		for _, variant := range product.Variants {
 			if variant.Name == record.Data[c.variantKey] {
 				found = true
-
+				sku := record.Data[c.skuKey]
 				oldPriceStr := data[c.priceKey]
 				oldPriceStr = strings.ReplaceAll(oldPriceStr, "Rp", "")
 				oldPriceStr = strings.ReplaceAll(oldPriceStr, ",", "")
@@ -75,7 +77,7 @@ func (c *Checker) Check() error {
 				}
 
 				if variant.IsPriceChanged(int(oldPrice)) {
-					log.Printf("[WARN] price change detected at row no. %d; new price: %d; product: %v\n", i+1, variant.Price, slug)
+					log.Printf("[WARN] price change detected; row: %d; new price: %d; sku: %s\n", i+1, variant.Price, sku)
 				}
 
 				oldStockLevel, err := strconv.ParseInt(data[c.stockLevelKey], 10, 32)
@@ -84,7 +86,7 @@ func (c *Checker) Check() error {
 				}
 
 				if variant.IsStockLevelChange(int(oldStockLevel)) {
-					log.Printf("[WARN] stock level change detected at row no. %d; new stock level: %d; slug: %v\n", i+1, variant.StockLevel(), slug)
+					log.Printf("[WARN] stock level change detected; row: %d; new stock level: %d; sku: %s\n", i+1, variant.StockLevel(), sku)
 				}
 
 				break
