@@ -4,6 +4,7 @@ import (
 	"encoding/csv"
 	"fmt"
 	"io"
+	"log"
 	"os"
 	"reflect"
 	"strings"
@@ -34,6 +35,8 @@ func NewCSV(file io.Reader) ([]Record, error) {
 	headers := strings.Split(headersEnv, ",")
 
 	if !reflect.DeepEqual(headers, records[0]) {
+		log.Println("Headers from env:", headers)
+		log.Println("Headers from csv:", records[0])
 		return []Record{}, fmt.Errorf("csv file has different format")
 	}
 
